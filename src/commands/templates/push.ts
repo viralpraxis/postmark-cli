@@ -46,6 +46,12 @@ export const builder = {
       'Push all local templates up to Postmark regardless of whether they changed',
     alias: 'a',
   },
+  targets: {
+    type: 'array',
+    describe:
+      'Templates aliases to be pushed (comma-separated)',
+    alias: 't',
+  },
 }
 
 type MaybeString = string | null | undefined
@@ -66,6 +72,7 @@ interface TemplatePushArguments {
   templatesdirectory: string
   force: boolean
   all: boolean
+  targets: string[]
 }
 export async function handler(args: TemplatePushArguments): Promise<void> {
   const serverToken = await validateToken(args.serverToken)
@@ -103,7 +110,7 @@ async function push(
   serverToken: string,
   args: TemplatePushArguments,
 ): Promise<void> {
-  const { templatesdirectory, force, requestHost, all } = args
+  const { templatesdirectory, force, requestHost, all, targets } = args
 
   const client = new ServerClient(serverToken)
   if (requestHost !== undefined && requestHost !== '') {
@@ -112,7 +119,7 @@ async function push(
 
   const spinner = ora('Fetching templates...').start()
   try {
-    const manifest = createManifest(templatesdirectory)
+    const manifest = createManifest(templatesdirectory, targets)
 
     if (manifest.length === 0) {
       return fatalError('No templates or layouts were found.')
