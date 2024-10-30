@@ -9,7 +9,7 @@ import { TemplateManifest, MetaFileTraverse, MetaFile } from '../../types'
  * Parses templates folder and files
  */
 
-export const createManifest = (path: string): TemplateManifest[] => {
+export const createManifest = (path: string, targets: string[] = []): TemplateManifest[] => {
   let manifest: TemplateManifest[] = []
 
   // Return empty array if path does not exist
@@ -21,7 +21,7 @@ export const createManifest = (path: string): TemplateManifest[] => {
   // Parse each directory
   list.forEach(file => {
     const item = createManifestItem(file)
-    if (item) manifest.push(item)
+    if (item && targets.includes(item.Alias)) manifest.push(item)
   })
 
   return manifest
